@@ -1,0 +1,35 @@
+@base = http://localhost:5256
+
+### get
+GET {{base}}/api/users
+Accept: application/json
+
+### get
+GET {{base}}/api/users/2
+Accept: application/json
+
+### post
+POST {{base}}/api/users
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username" : "Magna",
+    "fullname": "Magne w",
+    "email" : "magna@gmail.com",
+    "phone" : "081310310100",
+    "passwordHash" : null
+}
+
+### update
+PUT {{base}}/api/users/11
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username" : "yamiiiiii",
+    "fullname": "yamii",
+    "email" : "yamie@gmail.com",
+    "phone" : "081212300006",
+    "passwordHash" : null
+}

@@ -1,0 +1,12 @@
+@base = http://localhost:5256
+
+### Transfer
+POST {{base}}/api/transfer
+Content-Type: application/json
+
+{
+    "senderWalletId": 1,
+    "receiverWalletId": 2,
+    "amount": 5000,
+    "description": "Transfer ke teman"
+}

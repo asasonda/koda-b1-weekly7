@@ -1,0 +1,15 @@
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\bin\Debug\net10.0\Ewallet.Application.deps.json
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\bin\Debug\net10.0\Ewallet.Application.dll
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\bin\Debug\net10.0\Ewallet.Application.pdb
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\bin\Debug\net10.0\EWallet.Domain.dll
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\bin\Debug\net10.0\EWallet.Domain.pdb
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.csproj.AssemblyReference.cache
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.AssemblyInfoInputs.cache
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.AssemblyInfo.cs
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.csproj.CoreCompileInputs.cache
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet..0CCE5D0E.Up2Date
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.dll
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\refint\Ewallet.Application.dll
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\Ewallet.Application.pdb
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Application\obj\Debug\net10.0\ref\Ewallet.Application.dll

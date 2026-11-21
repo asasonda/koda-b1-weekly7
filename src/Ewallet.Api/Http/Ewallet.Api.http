@@ -1,0 +1,5 @@
+@base = http://localhost:5256
+
+### history
+GET {{base}}/api/users/6/transactions
+Accept: application/json

@@ -1,0 +1,35 @@
+@base = http://localhost:5256
+
+###search history mutation
+GET {{base}}/api/wallets/1/history/transactions?page=1&pageSize=10
+Accept: application/json
+
+### berdasarkan referenceNo
+GET {{base}}/api/wallets/1/history/transactions?referenceNo=RF001
+Accept: application/json
+
+
+### type dan status
+GET {{base}}/api/wallets/1/history/transactions?type=TRANSFER&status=SUCCESS
+Accept: application/json
+
+### tanggal dan sorting
+GET {{base}}/api/wallets/1/history/transactions?fromDate=2026-11-01&toDate=2026-11-17&sort=date_desc&page=1&pageSize=10
+Accept: application/json
+
+
+### mutasi wallet
+GET {{base}}/api/wallets/1/history/mutations?page=1&pageSize=10
+Accept: application/json
+
+### mutasi IN
+GET {{base}}/api/wallets/1/history/mutations?direction=IN
+Accept: application/json
+
+### mutasi OUT
+GET {{base}}/api/wallets/1/history/mutations?direction=OUT
+Accept: application/json
+
+### mutasi filter pakai date
+GET {{base}}/api/wallets/1/history/mutations?referenceNo=RF001&fromDate=2026-11-01&toDate=2026-11-17&sort=date_desc
+Accept: application/json

@@ -1,0 +1,5 @@
+@base = http://localhost:5256
+
+### get
+GET {{base}}/api/payment-method
+Accept: application/json
