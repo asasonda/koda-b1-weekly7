@@ -7,7 +7,7 @@ public sealed class AuditLogs
     public long Id {get; private set;}
 
     public long? ActorUserId {get; private set;}
-    public Users? Users {get; private set;} = null!;
+    // public Users? Users {get; private set;} = null!;
 
     public long? TransactionId {get; private set;} 
     public Transactions? Transactions {get; private set;} = null!;

@@ -9,3 +9,4 @@ D:\koda\NetCore\koda-b1-weekly7\src\EWallet.Domain\obj\Debug\net10.0\EWallet.Dom
 D:\koda\NetCore\koda-b1-weekly7\src\EWallet.Domain\obj\Debug\net10.0\refint\EWallet.Domain.dll
 D:\koda\NetCore\koda-b1-weekly7\src\EWallet.Domain\obj\Debug\net10.0\EWallet.Domain.pdb
 D:\koda\NetCore\koda-b1-weekly7\src\EWallet.Domain\obj\Debug\net10.0\ref\EWallet.Domain.dll
+D:\koda\NetCore\koda-b1-weekly7\src\EWallet.Domain\obj\Debug\net10.0\EWallet.Domain.sourcelink.json

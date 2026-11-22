@@ -240,66 +240,6 @@ namespace Ewallet.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("EWallet.Domain.Entities.Users", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("Phone")
-                        .IsUnique();
-
-                    b.HasIndex("UserName")
-                        .IsUnique();
-
-                    b.ToTable("Users", "dbo", t =>
-                        {
-                            t.HasCheckConstraint("CK_Users_Status", "[Status] in ('ACTIVE', 'SUSPENDED')");
-                        });
-                });
-
             modelBuilder.Entity("EWallet.Domain.Entities.WalletMutations", b =>
                 {
                     b.Property<long>("Id")
@@ -357,6 +297,9 @@ namespace Ewallet.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("AppUserId")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("Balance")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -378,9 +321,6 @@ namespace Ewallet.Api.Migrations
                     b.Property<DateTime?>("UpdatedAtUtc")
                         .HasColumnType("datetime");
 
-                    b.Property<long>("UsersId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("WalletNumber")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -388,7 +328,7 @@ namespace Ewallet.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UsersId")
+                    b.HasIndex("AppUserId")
                         .IsUnique();
 
                     b.HasIndex("WalletNumber")
@@ -483,7 +423,10 @@ namespace Ewallet.Api.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("AspNetUsers", "dbo", t =>
+                        {
+                            t.HasCheckConstraint("CK_AspNetUsers_Status", "[Status] in ('ACTIVE', 'SUSPENDED')");
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<long>", b =>
@@ -621,8 +564,8 @@ namespace Ewallet.Api.Migrations
 
             modelBuilder.Entity("EWallet.Domain.Entities.AuditLogs", b =>
                 {
-                    b.HasOne("EWallet.Domain.Entities.Users", "Users")
-                        .WithMany("AuditLogs")
+                    b.HasOne("Ewallet.Infrastructure.Identity.AppUser", null)
+                        .WithMany()
                         .HasForeignKey("ActorUserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -632,8 +575,6 @@ namespace Ewallet.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Transactions");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("EWallet.Domain.Entities.TopUpRequests", b =>
@@ -702,13 +643,11 @@ namespace Ewallet.Api.Migrations
 
             modelBuilder.Entity("EWallet.Domain.Entities.Wallets", b =>
                 {
-                    b.HasOne("EWallet.Domain.Entities.Users", "Users")
-                        .WithOne("Wallets")
-                        .HasForeignKey("EWallet.Domain.Entities.Wallets", "UsersId")
+                    b.HasOne("Ewallet.Infrastructure.Identity.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("EWallet.Domain.Entities.Wallets", "AppUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -774,14 +713,6 @@ namespace Ewallet.Api.Migrations
                     b.Navigation("TopUpRequests");
 
                     b.Navigation("WalletMutations");
-                });
-
-            modelBuilder.Entity("EWallet.Domain.Entities.Users", b =>
-                {
-                    b.Navigation("AuditLogs");
-
-                    b.Navigation("Wallets")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("EWallet.Domain.Entities.Wallets", b =>

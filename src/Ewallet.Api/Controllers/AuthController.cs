@@ -1,6 +1,8 @@
 using Ewallet.Application.DTOs.Auth;
 using Ewallet.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Ewallet.Api.Controllers;
 
@@ -15,7 +17,9 @@ public sealed class AuthController : ControllerBase
         _authService = authService;
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
+    [EnableRateLimiting("auth-register")]
     [ProducesResponseType(typeof(AuthUserResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
@@ -49,7 +53,9 @@ public sealed class AuthController : ControllerBase
         return BadRequest(problem);
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
+    [EnableRateLimiting("auth-login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]

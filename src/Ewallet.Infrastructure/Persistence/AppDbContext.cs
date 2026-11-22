@@ -3,7 +3,6 @@ using EWallet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Ewallet.Infrastructure.Persistence;
 
@@ -13,7 +12,7 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
     {
     }
 
-    public DbSet<Users> Users => Set<Users>();
+    // public DbSet<Users> Users => Set<Users>();
     public DbSet<Wallets> Wallets => Set<Wallets>();
     public DbSet<Transactions> Transactions => Set<Transactions>();
     public DbSet<WalletMutations> WalletMutations => Set<WalletMutations>();
@@ -27,56 +26,58 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
 
         modelBuilder.Entity<AppUser>(entity =>
         {
-            entity.Property(user => user.FullName).IsRequired().HasMaxLength(100);
-            entity.Property(user => user.Status).IsRequired().HasMaxLength(20);
-            entity.Property(user => user.CreatedAtUtc).IsRequired().HasColumnType("datetimeoffset");
-            entity.Property(user => user.UpdatedAtUtc).HasColumnType("datetimeoffset");
-        });
 
-        modelBuilder.Entity<Users>(entity =>
-        {
-            entity.ToTable("Users", "dbo", table =>
+            entity.ToTable("AspNetUsers", "dbo", table =>
             {
-               table.HasCheckConstraint("CK_Users_Status", "[Status] in ('ACTIVE', 'SUSPENDED')") ;
+               table.HasCheckConstraint("CK_AspNetUsers_Status", "[Status] in ('ACTIVE', 'SUSPENDED')") ;
             });
 
-            entity.HasKey(u => u.Id);
-
-            entity.Property(u => u.UserName)
-                .IsRequired()
-                .HasMaxLength(50);
-            
             entity.Property(u => u.FullName)
                 .IsRequired()
                 .HasMaxLength(100);
             
-            entity.Property(u => u.Email)
-                .IsRequired()
-                .HasMaxLength(150);
-            
-            entity.Property(u => u.Phone)
-                .IsRequired()
-                .HasMaxLength(20);
-
-            entity.Property(u => u.PasswordHash)
-                .HasMaxLength(500);
-            
             entity.Property(u => u.Status)
                 .IsRequired()
                 .HasMaxLength(20);
-            
+
             entity.Property(u => u.CreatedAtUtc)
                 .IsRequired()
-                .HasColumnType("datetime");
+                .HasColumnType("datetimeoffset");
             
             entity.Property(u => u.UpdatedAtUtc)
-                .HasColumnType("datetime");
-
-            entity.HasIndex(u => u.UserName).IsUnique();
-            entity.HasIndex(u => u.Email).IsUnique();
-            entity.HasIndex(u => u.Phone).IsUnique();
-
+                .HasColumnType("datetimeoffset");
         });
+
+        // modelBuilder.Entity<Users>(entity =>
+        // {
+        //     entity.ToTable("Users", "dbo", table =>
+        //     {
+        //        table.HasCheckConstraint("CK_Users_Status", "[Status] in ('ACTIVE', 'SUSPENDED')") ;
+        //     });
+
+        //     entity.HasKey(u => u.Id);
+            
+        //     entity.Property(u => u.FullName)
+        //         .IsRequired()
+        //         .HasMaxLength(100);
+            
+        //     entity.Property(u => u.Status)
+        //         .IsRequired()
+        //         .HasMaxLength(20);
+            
+        //     entity.Property(u => u.CreatedAtUtc)
+        //         .IsRequired()
+        //         .HasColumnType("datetime");
+            
+        //     entity.Property(u => u.UpdatedAtUtc)
+        //         .HasColumnType("datetime");
+            
+        //     entity.HasOne<AppUser>().WithOne().HasForeignKey<Users>(f => f.AppUserId).OnDelete(DeleteBehavior.Restrict);
+
+        //     entity.HasIndex(i => i.AppUserId).IsUnique();
+
+        // });
+
 
         modelBuilder.Entity<Wallets>(entity =>
         {
@@ -88,7 +89,7 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
 
             entity.HasKey(w => w.Id);
 
-            entity.Property(w => w.UsersId)
+            entity.Property(w => w.AppUserId)
                 .IsRequired();
 
             entity.Property(w => w.WalletNumber)
@@ -114,12 +115,12 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
             entity.Property(w => w.UpdatedAtUtc)
                 .HasColumnType("datetime");
 
-            entity.HasOne(w => w.Users)
-                .WithOne(u => u.Wallets)
-                .HasForeignKey<Wallets>(f => f.UsersId)
+            entity.HasOne<AppUser>()
+                .WithOne()
+                .HasForeignKey<Wallets>(f => f.AppUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasIndex(w => w.UsersId).IsUnique();
+            entity.HasIndex(w => w.AppUserId).IsUnique();
             entity.HasIndex(w => w.WalletNumber).IsUnique();
         });
 
@@ -371,8 +372,8 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
                 .IsRequired()
                 .HasColumnType("datetime");
             
-            entity.HasOne(a => a.Users)
-                .WithMany(u => u.AuditLogs)
+            entity.HasOne<AppUser>()
+                .WithMany()
                 .HasForeignKey(f => f.ActorUserId)
                 .OnDelete(DeleteBehavior.Restrict);
             

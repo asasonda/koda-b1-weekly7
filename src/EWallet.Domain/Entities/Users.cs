@@ -4,11 +4,8 @@ public sealed class Users
 {
     private Users() {}
     public long Id {get; private set;}
-    public string UserName {get; private set;}
+    public long AppUserId { get; private set; }
     public string FullName {get; private set;}
-    public string Email {get; private set;}
-    public string Phone {get; private set;}
-    public string? PasswordHash {get; private set;}
     public string Status {get; private set;}
     public DateTime CreatedAtUtc {get; private set;}
     public DateTime? UpdatedAtUtc {get; private set;}
@@ -18,60 +15,25 @@ public sealed class Users
     public ICollection<AuditLogs> AuditLogs { get; private set; } = [];
     
 
-    public Users(string userName, string fullName, string email, string phone, string? passwordHash)
+    public Users(long appUserId, string fullName)
     {
-        if (string.IsNullOrWhiteSpace(userName))
-        {
-            throw new ArgumentException("Username not valid", nameof(userName));
-        }
-        if (string.IsNullOrWhiteSpace(fullName))
-        {
-            throw new ArgumentException("fullname not valid", nameof(fullName));
-        }
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new ArgumentException("Email is required", nameof(email));
-        }
+        if(appUserId <= 0) throw new ArgumentException("Appuserid is required");
+        if (string.IsNullOrWhiteSpace(fullName)) throw new ArgumentException("fullname not valid", nameof(fullName));
 
-        if (string.IsNullOrWhiteSpace(phone))
-        {
-            throw new ArgumentException("Phone is required", nameof(phone));
-        }
-
-        UserName = userName;
+        AppUserId = appUserId;
         FullName = fullName;
-        Email = email;
-        Phone = phone;
-        PasswordHash = passwordHash;
         Status = "ACTIVE";
         CreatedAtUtc = DateTime.UtcNow;
     }
 
-    public void UpdateDetail(string userName, string fullName, string email, string phone, string? passwordHash)
+    public void UpdateDetail(string fullName)
     {
-        if (string.IsNullOrWhiteSpace(userName))
-        {
-            throw new ArgumentException("Username not valid", nameof(userName));
-        }
         if (string.IsNullOrWhiteSpace(fullName))
         {
             throw new ArgumentException("fullname not valid", nameof(fullName));
         }
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new ArgumentException("Email is required", nameof(email));
-        }
 
-        if (string.IsNullOrWhiteSpace(phone))
-        {
-            throw new ArgumentException("Phone is required", nameof(phone));
-        }
-
-        UserName = userName;
         FullName = fullName;
-        Email = email;
-        Phone = phone;
-        PasswordHash = passwordHash;
         UpdatedAtUtc = DateTime.UtcNow;
     }
 

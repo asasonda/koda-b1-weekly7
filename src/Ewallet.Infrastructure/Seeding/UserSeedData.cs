@@ -1,77 +1,101 @@
 
-using EWallet.Domain.Entities;
+using Ewallet.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
+// Sesuaikan namespace AppUser dengan lokasi class AppUser kamu.
+using Ewallet.Infrastructure.Identity;
+using EWallet.Domain.Entities;
 
 namespace Ewallet.Api.Seeding;
 
 public static class UserSeedData
 {
-    private static IEnumerable<Users> InitialUsers()
+    private static IEnumerable<(string Username, string FullName, string Email, string Phone)> InitialUsers()
     {
-        yield return new Users("Afif", "Afif sasonda", "afif@gmail.com", "081234567801", null);
-        yield return new Users("Rizal", "rizal kadamong", "rizal@gmail.com", "081234567802", null);
-        yield return new Users("Zakky", "zakyyyyyy", "zakky@gmail.com", "081234567803", null);
-        yield return new Users("Bando", "Bando mega", "bando@gmail.com", "081234567804", null);
-        yield return new Users("Alvin", "Alvin C.", "alvin@gmail.com", "081234567805", null);
-        yield return new Users("Rifai", "A. Rifai", "rifai@gmail.com", "081234567806", null);
-        yield return new Users("Chandra", "Chandar A", "chandra@gmail.com", "081234567807", null);
-        yield return new Users("Dimas", "Dimas B", "dimas@gmail.com", "081234567808", null);
-        yield return new Users("Andi", "Andianto", "andi@gmail.com", "081234567809", null);
-        yield return new Users("Budi", "Budiono", "budi@gmail.com", "081234567810", null);
+        yield return ("Afif", "Afif Sasonda", "afif@gmail.com", "081234567801");
+        yield return ("Rizal", "Rizal Kadamong", "rizal@gmail.com", "081234567802");
+        yield return ("Zakky", "Zakky", "zakky@gmail.com", "081234567803");
+        yield return ("Bando", "Bando Mega", "bando@gmail.com", "081234567804");
+        yield return ("Alvin", "Alvin C.", "alvin@gmail.com", "081234567805");
+        yield return ("Rifai", "A. Rifai", "rifai@gmail.com", "081234567806");
+        yield return ("Chandra", "Chandra A", "chandra@gmail.com", "081234567807");
+        yield return ("Dimas", "Dimas B", "dimas@gmail.com", "081234567808");
+        yield return ("Andi", "Andianto", "andi@gmail.com", "081234567809");
+        yield return ("Budi", "Budiono", "budi@gmail.com", "081234567810");
     }
 
-    public static void Seed(DbContext context)
+    public static async Task SeedAsync(
+        UserManager<AppUser> userManager,
+        AppDbContext db,
+        CancellationToken ct)
     {
-        int number = 1;
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-        foreach (var user in InitialUsers())
+        try
         {
-            bool exists = context.Set<Users>()
-                .Any(u => u.Email == user.Email);
+            int number = 1;
 
-            if (exists)
-                continue;
+            foreach (var item in InitialUsers())
+            {
+                var email = item.Email;
 
-            var walletNumber = $"WAL{number:D3}";
+                var appUser = await userManager.FindByEmailAsync(email);
 
-            var wallet = new Wallets(
-                user,
-                walletNumber,
-                0
-            );
+                if (appUser is null)
+                {
+                    appUser = new AppUser
+                    {
+                        UserName = item.Username,
+                        Email = email,
+                        PhoneNumber = item.Phone,
+                        FullName = item.FullName
+                    };
 
-            context.Set<Users>().Add(user);
-            context.Set<Wallets>().Add(wallet);
+                    var result = await userManager.CreateAsync(
+                        appUser,
+                        "Seed@12345"
+                    );
 
-            number++;
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Join(
+                            ", ",
+                            result.Errors.Select(e => e.Description)
+                        );
+
+                        throw new InvalidOperationException(
+                            $"Gagal membuat user {email}: {errors}"
+                        );
+                    }
+                }
+
+                bool walletExists = await db.Wallets
+                    .AnyAsync(w => w.AppUserId == appUser.Id, ct);
+
+                if (!walletExists)
+                {
+                    var walletNumber = $"WAL{number:D3}";
+
+                    var wallet = new Wallets(
+                        appUser.Id,
+                        walletNumber,
+                        0
+                    );
+
+                    db.Wallets.Add(wallet);
+                }
+
+                number++;
+            }
+
+            await db.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
         }
-
-        context.SaveChanges();
-    }
-
-    public static async Task SeedAsync(DbContext context, CancellationToken ct)
-    {
-        int number = 1;
-
-        foreach (var user in InitialUsers())
+        catch
         {
-            bool exists = await context.Set<Users>()
-                .AnyAsync(u => u.Email == user.Email, ct);
-
-            if (exists)
-                continue;
-
-            var walletNumber = $"WAL{number:D3}";
-
-            var wallet = new Wallets(
-                user,
-                walletNumber,
-                0
-            );
-            context.Set<Users>().Add(user);
-            context.Set<Wallets>().Add(wallet);
-            number++;
+            await transaction.RollbackAsync(CancellationToken.None);
+            throw;
         }
-        await context.SaveChangesAsync(ct);
     }
 }

@@ -23,12 +23,12 @@ public static class DepedencyInjection
                 .UseSeeding((context, _) =>
                 {
                     PaymentMethodSeedData.Seed(context);
-                    UserSeedData.Seed(context);
+                    // UserSeedData.Seed(context);
                 })
                 .UseAsyncSeeding(async (context, _, ct) =>
                 {
                     await PaymentMethodSeedData.SeedAsync(context, ct);
-                    await UserSeedData.SeedAsync(context,ct);
+                    // await UserSeedData.SeedAsync(context,ct);
                 });
         });
 

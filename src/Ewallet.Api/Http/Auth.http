@@ -5,9 +5,11 @@ POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-    "email": "andi@gmail.com",
-    "password": "Andi123@@",
-    "fullName": "Andiadi"
+    "username": "andiii",
+    "fullname": "Andika W",
+    "email": "andika@gmail.com",
+    "password": "Andika123@@",
+    "phoneNumber": "081345671221"
 }
 
 ### Login
@@ -15,6 +17,6 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "andi@gmail.com",
-    "password": "Andi123@@"
+    "email": "andika@gmail.com",
+    "password": "Andika123@@"
 }

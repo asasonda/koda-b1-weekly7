@@ -383,3 +383,5 @@ D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Api\bin\Debug\net10.0\Ewallet.Applic
 D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Api\bin\Debug\net10.0\Ewallet.Infrastructure.pdb
 D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Api\bin\Debug\net10.0\EWallet.Domain.pdb
 D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Api\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Api\obj\Debug\net10.0\Ewallet.Api.sourcelink.json
+D:\koda\NetCore\koda-b1-weekly7\src\Ewallet.Api\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

@@ -57,19 +57,19 @@ public sealed class EfTopUpRequestRespository : ITopUpRequest
                 balanceAfter
             );
 
-            var auditLog = new AuditLogs(
-                wallet.UsersId,
-                transactionTopUp.Id,
-                "Confimation TopUp",
-                "TopUpRequests",
-                topUp.Id.ToString(),
-                transactionTopUp.Status,
-                "Topup successfuly",
-                null
-            );
+            // var auditLog = new AuditLogs(
+            //     wallet.UsersId,
+            //     transactionTopUp.Id,
+            //     "Confimation TopUp",
+            //     "TopUpRequests",
+            //     topUp.Id.ToString(),
+            //     transactionTopUp.Status,
+            //     "Topup successfuly",
+            //     null
+            // );
 
             _db.WalletMutations.Add(walletMutation);
-            _db.AuditLogs.Add(auditLog);
+            // _db.AuditLogs.Add(auditLog);
 
             await _db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);

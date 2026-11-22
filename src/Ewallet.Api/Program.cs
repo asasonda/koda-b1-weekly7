@@ -1,6 +1,12 @@
+using System.Threading.RateLimiting;
 using Ewallet.Api.Middlewares;
+using Ewallet.Api.Seeding;
 using Ewallet.Application.Services;
 using Ewallet.Infrastructure;
+using Ewallet.Infrastructure.Identity;
+using Ewallet.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -25,7 +31,6 @@ builder.Services.AddProblemDetails(
     }
 );
 builder.Services.AddInfrastructure(builder.Configuration);
-
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 
@@ -46,13 +51,69 @@ builder.Services.AddCors(option =>
     {
         policy.WithOrigins(allowedOrigins)
         .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        .AllowAnyMethod();
+    });
+});
 
+builder.Services.AddRateLimiter(option =>
+{
+    option.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    option.AddConcurrencyLimiter("category-writes", limiter =>
+    {
+        limiter.PermitLimit = 8;
+        limiter.QueueLimit = 0;
+    });
+
+    // Untuk Login
+    option.AddPolicy("auth-login", context =>
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "Nihil";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"login:{ip}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(3),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }
+        );
+    });
+
+    option.AddPolicy("auth-register", context =>
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "Nihil";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"register:{ip}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }
+        );
     });
 });
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var db = services.GetRequiredService<AppDbContext>();
+
+    await UserSeedData.SeedAsync(
+        userManager,
+        db,
+        CancellationToken.None
+    );
+}
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
@@ -61,12 +122,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.UseCors("ReactClient");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseRateLimiter();
+
 app.MapControllers();
-// app.MapControllerRoute(
-//     name: "default",
-//     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

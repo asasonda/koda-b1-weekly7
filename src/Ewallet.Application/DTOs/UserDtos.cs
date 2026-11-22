@@ -1,49 +1,31 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Ewallet.Application.DTOs;
 
-public sealed record CreateUserRequest(
-    [Required(ErrorMessage = "Username wajib diisi.")]
-    [StringLength(50, ErrorMessage = "Username maksimal 50 karakter.")]
-    string UserName,
-
-    [Required(ErrorMessage = "Fullname wajib diisi.")]
-    [StringLength(100, ErrorMessage = "Nama maksimal 100 karakter.")]
-    string FullName,
-
-    [Required(ErrorMessage = "Email wajib diisi.")]
-    [EmailAddress(ErrorMessage = "Format email tidak valid.")]
-    [StringLength(150, ErrorMessage = "Email maksimal 100 karakter.")]
-    string Email,
-
-    [Required(ErrorMessage = "Nomor telepon wajib diisi.")]
-    [StringLength(20, ErrorMessage = "Nomor telepon maksimal 20 karakter.")]
-    string Phone,
-
-    [StringLength(500, ErrorMessage = "Password maksimal 500 karakter")]
-    string? PasswordHash
-);
+using System.ComponentModel.DataAnnotations;
 
 public sealed record UpdatedUserRequest(
-    [Required(ErrorMessage = "Username wajib diisi.")]
-    [StringLength(50, ErrorMessage = "Username maksimal 50 karakter.")]
+    [Required(ErrorMessage = "Username wajib diisi")]
+    [StringLength(50, ErrorMessage = "Username maksimal 50 karakter")]
     string UserName,
 
-    [Required(ErrorMessage = "Fullname wajib diisi.")]
-    [StringLength(100, ErrorMessage = "Nama maksimal 100 karakter.")]
+    [Required(ErrorMessage = "Fullname wajib diisi")]
+    [StringLength(100, ErrorMessage = "Fullname maksimal 100 karakter")]
     string FullName,
 
-    [Required(ErrorMessage = "Email wajib diisi.")]
-    [EmailAddress(ErrorMessage = "Format email tidak valid.")]
-    [StringLength(150, ErrorMessage = "Email maksimal 100 karakter.")]
+    [Required(ErrorMessage = "Email wajib diisi")]
+    [EmailAddress(ErrorMessage = "Format email tidak valid")]
+    [StringLength(150)]
     string Email,
 
-    [Required(ErrorMessage = "Nomor telepon wajib diisi.")]
-    [StringLength(20, ErrorMessage = "Nomor telepon maksimal 20 karakter.")]
-    string Phone,
+    [Required(ErrorMessage = "Nomor telepon wajib diisi")]
+    [Phone(ErrorMessage = "Format nomor telepon tidak valid")]
+    [StringLength(20)]
+    string PhoneNumber,
 
-    [StringLength(500, ErrorMessage = "Password maksimal 500 karakter")]
-    string? PasswordHash
+    string? CurrentPassword,
+
+    [StringLength(20, MinimumLength = 8,
+        ErrorMessage = "Password harus 8-20 karakter")]
+    string? NewPassword
 );
 
 public sealed record WalletResponse(
@@ -54,13 +36,26 @@ public sealed record WalletResponse(
 );
 
 public sealed record UserResponse(
-    long Id, 
-    string UserName, 
-    string FullName, 
-    string Email, 
-    string Phone, 
-    string Status, 
-    DateTime CreatedAtUtc, 
-    DateTime? UpdatedAtUtc, 
+    long Id,
+    string Username,
+    string FullName,
+    string Email,
+    string PhoneNumber,
+    string Status,
+    DateTimeOffset CreatedAtUtc,
+    DateTimeOffset? UpdatedAtUtc,
     WalletResponse Wallet
 );
+
+// public sealed record UserResponse(
+//     long Id,
+//     long AppUserId,
+//     string UserName,
+//     string FullName,
+//     string Email,
+//     string PhoneNumber,
+//     string Status,
+//     DateTime CreatedAtUtc,
+//     DateTime? UpdatedAtUtc,
+//     WalletResponse Wallet
+// );

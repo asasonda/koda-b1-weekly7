@@ -2,7 +2,7 @@ namespace Ewallet.Application.DTOs.Auth;
 
 public enum RegisterStatus
 {
-    Created, DuplicateEmail, ValidationError
+    Created, DuplicateEmail, DuplicateUserName, ValidationError
 }
 
 public sealed record RegisterResult
