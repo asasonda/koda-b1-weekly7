@@ -6,5 +6,6 @@ public sealed record AuthUserResponse(
     string Email,
     string Status,
     DateTimeOffset CreatedAtUtc,
-    DateTimeOffset? UpdatedAtUtc
+    DateTimeOffset? UpdatedAtUtc,
+    IReadOnlyList<string> Roles
 );

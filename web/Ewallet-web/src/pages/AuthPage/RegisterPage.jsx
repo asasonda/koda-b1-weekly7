@@ -1,29 +1,57 @@
-import { useState } from 'react';
-import AuthAside from '@/components/page/login-register/AuthAside';
-import Button from '@/components/ui/Button';
-import InputForm from '@/components/ui/InputForm';
-import { NavLink } from 'react-router';
+import { useState } from "react";
+import AuthAside from "@/components/page/login-register/AuthAside";
+import Button from "@/components/ui/Button";
+import InputForm from "@/components/ui/InputForm";
+import { NavLink, useNavigate } from "react-router";
+import { registerUser } from "@/services/authApi";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    fullName: '',
-    username: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    fullName: "",
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
   });
 
-  const handleChange = (field) => (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
-  };
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register submitted:', formData);
+
+    setError("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Password dan konfirmasi password tidak sama.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await registerUser({
+        fullName: formData.fullName,
+        username: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
+
+      navigate("/login", {
+        replace: true,
+        state: {
+          message: "Registrasi berhasil. Silakan login.",
+          email: formData.email,
+        },
+      });
+    } catch (err) {
+      setError(err.message || "Terjadi kesalahan saat registrasi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,7 +80,7 @@ export default function RegisterPage() {
                 label="Nama lengkap"
                 type="text"
                 value={formData.fullName}
-                onChange={handleChange('fullName')}
+                onChange={handleChange}
                 placeholder="Nadia Putri"
                 required
               />
@@ -62,7 +90,7 @@ export default function RegisterPage() {
                 label="Username"
                 type="text"
                 value={formData.username}
-                onChange={handleChange('username')}
+                onChange={handleChange("username")}
                 placeholder="nadia"
                 required
               />
@@ -72,7 +100,7 @@ export default function RegisterPage() {
                 label="Email"
                 type="email"
                 value={formData.email}
-                onChange={handleChange('email')}
+                onChange={handleChange("email")}
                 placeholder="nadia@example.com"
                 required
               />
@@ -82,7 +110,7 @@ export default function RegisterPage() {
                 label="Nomor telepon"
                 type="tel"
                 value={formData.phone}
-                onChange={handleChange('phone')}
+                onChange={handleChange("phone")}
                 placeholder="0812 3456 7890"
                 required
               />
@@ -92,7 +120,7 @@ export default function RegisterPage() {
                 label="Password"
                 type="password"
                 value={formData.password}
-                onChange={handleChange('password')}
+                onChange={handleChange("password")}
                 placeholder="Minimal 8 karakter"
                 required
               />
@@ -102,7 +130,7 @@ export default function RegisterPage() {
                 label="Konfirmasi password"
                 type="password"
                 value={formData.confirmPassword}
-                onChange={handleChange('confirmPassword')}
+                onChange={handleChange("confirmPassword")}
                 placeholder="Ulangi password"
                 required
               />
@@ -113,12 +141,12 @@ export default function RegisterPage() {
             </p>
 
             <div className="pt-1">
-              <Button type="submit" children="Buat akun"/>
+              <Button type="submit" children="Buat akun" />
             </div>
           </form>
 
           <div className="mt-7 mb-8 text-center text-xs font-medium text-[#666666]">
-            Sudah terdaftar?{' '}
+            Sudah terdaftar?{" "}
             <NavLink
               to="/login"
               className="font-semibold text-[#326259] hover:underline ml-0.5"

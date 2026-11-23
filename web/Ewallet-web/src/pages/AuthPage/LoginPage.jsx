@@ -1,67 +1,62 @@
 import AuthAside from "@/components/page/login-register/AuthAside";
 import Button from "@/components/ui/Button";
 import InputForm from "@/components/ui/InputForm";
-import { authApi } from "@/services/authApi";
+import { useAuth } from "@/Hooks/useAuth";
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { Navigate, NavLink, useLocation, useNavigate } from "react-router";
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { login, status, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const destination = useLocation().state?.from?.pathname ?? "/dashboard";
 
-  const [isLoading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [verifiedUser, setVerifiedUser] = useState(null);
 
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-
+  const handleChange = ({ target: { name, value } }) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setErrorMessage("");
-    setSuccessMessage("");
+  };
 
-    setVerifiedUser(null);
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
+  async function handleSubmit(e) {
+    e.preventDefault();
     if (isLoading) return;
-
-    setErrorMessage("");
-    setSuccessMessage("");
-    setVerifiedUser(null);
-
-    if (!formData.email.trim() || !formData.password.trim()) {
-      setErrorMessage("Email dan password wajib diisi");
+    if (!formData.email.trim() || !formData.password) {
+      return setErrorMessage("Email dan password wajib diisi.");
     }
 
-    setLoading(true);
+    setErrorMessage("");
+    setIsLoading(true);
 
     try {
-      const response = await authApi(formData);
-      setVerifiedUser(response.user);
-      setSuccessMessage("Email dan password cocok");
-
-      setFormData((previous) => ({
-        ...previous,
-        password: "",
-      }));
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "Terjadi kesalahan saat login",
-      );
+      await login(formData);
+      setFormData((prev) => ({ ...prev, password: "" }));
+      navigate(destination, { replace: true });
+    } catch (err) {
+      const msg =
+        err?.status === 401
+          ? "Email atau password salah."
+          : err?.status === 429
+            ? "Terlalu banyak percobaan Login. Coba kembali nanti."
+            : err instanceof Error
+              ? err.message
+              : "Login gagal. Silakan coba kembali.";
+      setErrorMessage(msg);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
+
+  if (status === "checking") {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        Memeriksa sesi Login...
+      </main>
+    );
+  }
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
@@ -92,23 +87,10 @@ export default function LoginPage() {
             </div>
           )}
 
-          {successMessage && (
-            <div
-              role="status"
-              className="mt-5 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800"
-            >
-              <p className="font-semibold">Verifikasi berhasil</p>
-              <p className="mt-1">{successMessage}</p>
-              {verifiedUser && (
-                <p className="mt-2">User: {verifiedUser.user}</p>
-              )}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <InputForm
-                label="Email atau username"
+                label="Email"
                 id="email"
                 type="email"
                 value={formData.email}

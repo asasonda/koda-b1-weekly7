@@ -1,4 +1,4 @@
-namespace KodaStore.Infrastructure.Identity;
+namespace Ewallet.Infrastructure.Identity;
 
 public sealed class JwtOptions
 {

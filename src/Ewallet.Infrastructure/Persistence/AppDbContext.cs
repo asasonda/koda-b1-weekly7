@@ -19,6 +19,7 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
     public DbSet<PaymentMethods> PaymentMethods => Set<PaymentMethods>();
     public DbSet<TopUpRequests> TopUpRequests => Set<TopUpRequests>();
     public DbSet<AuditLogs> AuditLogs => Set<AuditLogs>();
+    public DbSet<RefreshToken> RefreshToken => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,6 +78,32 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, IdentityRole<long>
         //     entity.HasIndex(i => i.AppUserId).IsUnique();
 
         // });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+           entity.ToTable("RefreshTokens", "dbo");
+           entity.HasKey(token => token.Id);
+           entity.Property(t => t.Id);
+           entity.Property(t => t.FamilyId);
+           entity.Property(t => t.TokenHash).HasMaxLength(64).IsUnicode(false).IsRequired();
+           entity.Property(token => token.CreatedAtUtc).HasColumnType("datetimeoffset");
+           entity.Property(token => token.ExpiresAtUtc).HasColumnType("datetimeoffset");
+           entity.Property(token => token.UsedAtUtc).HasColumnType("datetimeoffset");
+           entity.Property(token => token.RevokedAtUtc).HasColumnType("datetimeoffset");
+
+           entity.HasOne(token => token.User)
+                .WithMany()
+                .HasForeignKey(token => token.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+           entity.HasIndex(t => new
+           {
+              t.AppUserId,
+              t.FamilyId 
+           });
+           entity.HasIndex(t => t.FamilyId);
+           entity.HasIndex(t => t.TokenHash).IsUnique();
+        });
 
 
         modelBuilder.Entity<Wallets>(entity =>

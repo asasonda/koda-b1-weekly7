@@ -1,5 +1,6 @@
 using Ewallet.Application.DTOs.Auth;
 using Ewallet.Application.Repositories;
+using Ewallet.Application.Security;
 using Ewallet.Application.Services;
 using Ewallet.Infrastructure.Persistence;
 using EWallet.Domain.Entities;
@@ -31,13 +32,15 @@ public sealed class IdentityAuthService(UserManager<AppUser> user, AppDbContext 
             return new LoginResult(false, null);
         }
 
+        var roles = await _user.GetRolesAsync(user);
         var response = new AuthUserResponse(
             user.Id, 
             user.UserName!,
             user.Email!,
             user.Status,
             user.CreatedAtUtc,
-            user.UpdatedAtUtc
+            user.UpdatedAtUtc,
+            roles.ToArray()
         );
 
         return new LoginResult(true, response);
@@ -102,15 +105,24 @@ public sealed class IdentityAuthService(UserManager<AppUser> user, AppDbContext 
                 return new RegisterResult(RegisterStatus.ValidationError,null!,["Created failed!"]);
             }
 
+            var roleResult = await _user.AddToRoleAsync(appUser, AppRoles.Customer);
+            if (!roleResult.Succeeded)
+            {
+                var errors = string.Join("; ", roleResult.Errors.Select(error => error.Description));
+                throw new InvalidOperationException($"Gagal memberikan role CUSTOMER: {errors}");
+            }
+
             await transaction.CommitAsync(cancellationToken);
 
+            var roles = await _user.GetRolesAsync(appUser);
             var response = new AuthUserResponse(
                 appUser.Id,
                 appUser.UserName!,
                 appUser.Email!,
                 appUser.Status,
                 appUser.CreatedAtUtc,
-                appUser.UpdatedAtUtc
+                appUser.UpdatedAtUtc,
+                roles.ToArray()
             );
 
             return new RegisterResult(
