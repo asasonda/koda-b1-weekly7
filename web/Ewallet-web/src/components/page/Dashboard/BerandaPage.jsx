@@ -39,9 +39,7 @@ export function BerandaPage({
 }) {
   return (
     <div className="space-y-5 max-w-6xl">
-      {/* Baris Atas: Kartu Saldo + Aksi Cepat */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        {/* Kartu Saldo Utama */}
         <section className="lg:col-span-8 rounded-2xl bg-[#2f5f51] text-white p-7 flex flex-col justify-between min-h-[210px]">
           <div>
             <p className="text-[11px] font-semibold tracking-widest text-[#b7d1c9] uppercase">
@@ -65,7 +63,6 @@ export function BerandaPage({
           </div>
         </section>
 
-        {/* Kartu Aksi Cepat */}
         <section className="lg:col-span-4 rounded-2xl bg-white border border-[#e6ece9] p-6 flex flex-col justify-between">
           <div>
             <h2 className="text-base font-semibold text-[#17231f]">
@@ -96,7 +93,6 @@ export function BerandaPage({
         </section>
       </div>
 
-      {/* Baris Bawah: Aktivitas Terakhir */}
       <section className="rounded-2xl bg-white border border-[#e6ece9] p-6">
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#eef2f0]">
           <div>

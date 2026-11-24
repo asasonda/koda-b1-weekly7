@@ -1,18 +1,45 @@
+import { useAuth } from "@/Hooks/useAuth";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+
 const MENU_ITEMS = [
-  { id: 'beranda', label: 'Beranda' },
-  { id: 'topup', label: 'Isi Saldo' },
-  { id: 'transfer', label: 'Transfer' },
-  { id: 'aktivitas', label: 'Aktivitas' },
-  { id: 'pengaturan', label: 'Pengaturan' },
-  { id: 'keluar', label: 'Keluar' },
+  { id: "beranda", label: "Beranda" },
+  { id: "topup", label: "Isi Saldo" },
+  { id: "transfer", label: "Transfer" },
+  { id: "aktivitas", label: "Aktivitas" },
+  { id: "pengaturan", label: "Pengaturan" },
+  { id: "keluar", label: "Keluar" },
 ];
 
 export function DashboardLayout({
-  activeMenu = 'beranda',
+  activeMenu = "beranda",
   onSelectMenu,
-  user = { initials: 'NP', name: 'Nadia' },
+  user = { initials: "NP", name: "Nadia" },
   children,
 }) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+
+    try {
+      setLoggingOut(true);
+      setError("");
+
+      await logout();
+
+      navigate("/login", { replace: true });
+    } catch (err) {
+      setError(err.message || "Gagal logout. Silakan coba lagi.");
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f6f8f7] text-[#17231f] flex">
       <aside className="w-60 shrink-0 bg-white border-r border-[#e6ece9] flex flex-col justify-between p-5">
@@ -37,14 +64,26 @@ export function DashboardLayout({
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => onSelectMenu?.(item.id)}
+                  disabled={item.id === "keluar" && loggingOut}
+                  onClick={() => {
+                    if (item.id === "keluar") {
+                      handleLogout();
+                      return;
+                    }
+
+                    onSelectMenu?.(item.id);
+                  }}
                   className={`w-full text-left px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
-                    isActive
-                      ? 'bg-[#edf4f1] text-[#234e42] font-medium'
-                      : 'text-[#5b6964] hover:bg-[#f4f7f6] hover:text-[#17231f]'
+                    item.id === "keluar"
+                      ? "text-[#5b6964] hover:bg-red-50"
+                      : isActive
+                        ? "bg-[#edf4f1] text-[#234e42] font-medium"
+                        : "text-[#5b6964] hover:bg-[#f4f7f6] hover:text-[#17231f]"
                   }`}
                 >
-                  {item.label}
+                  {item.id === "keluar" && loggingOut
+                    ? "Sedang keluar..."
+                    : item.label}
                 </button>
               );
             })}
@@ -74,7 +113,8 @@ export function DashboardLayout({
               Beranda
             </h1>
             <p className="text-xs text-[#73827d] mt-1.5">
-              Selasa, 17 November 2026 <span className="mx-1.5">•</span> Selamat datang kembali.
+              Selasa, 17 November 2026 <span className="mx-1.5">•</span> Selamat
+              datang kembali.
             </p>
           </div>
 
@@ -89,6 +129,14 @@ export function DashboardLayout({
         </header>
 
         <main className="px-8 py-5 space-y-5 flex-1">
+          {error && (
+            <div
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3"
+            >
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
           {children}
         </main>
       </div>

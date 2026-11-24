@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authContext";
-import { ApiError, loginUser, logoutUser, refreshSession } from "@/services/authApi";
-
+import {
+  ApiError,
+  loginUser,
+  logoutUser,
+  refreshSession,
+} from "@/services/authApi";
 
 const EMPTY_SESSION = { user: null, accessToken: null, expiresAtUtc: null };
 
@@ -48,8 +52,11 @@ export function AuthProvider({ children }) {
   }, [applySession, clearSession]);
 
   const logout = useCallback(async () => {
-    await logoutUser();
-    clearSession();
+    try {
+      await logoutUser();
+    } finally {
+      clearSession();
+    }
   }, [clearSession]);
 
   const contextValue = useMemo(

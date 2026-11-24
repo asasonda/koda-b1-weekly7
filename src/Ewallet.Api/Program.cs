@@ -219,5 +219,3 @@ app.UseRateLimiter();
 app.MapControllers();
 
 app.Run();
-
-// afif@gmail.com

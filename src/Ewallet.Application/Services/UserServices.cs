@@ -1,6 +1,7 @@
 using Ewallet.Application.DTOs;
 using EWallet.Domain.Entities;
 using Ewallet.Application.Repositories;
+using Ewallet.Application.DTOs.Dashboard;
 
 namespace Ewallet.Application.Services;
 
@@ -22,6 +23,11 @@ public sealed class UserServices : IUserServices
     public async Task<UserResponse?> GetByUserIdAsync(long id, CancellationToken cancellationToken)
     {
         return await _repository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public Task<UserResponseDashboard?> GetDashboardAsync(long appUserId, CancellationToken cancellationToken = default)
+    {
+        return _repository.GetDashboardAsync(appUserId,cancellationToken);
     }
 
 }

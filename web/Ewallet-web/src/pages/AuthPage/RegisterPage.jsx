@@ -10,8 +10,9 @@ export default function RegisterPage() {
     fullName: "",
     username: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     password: "",
+    confirmPassword: "",
   });
 
   const navigate = useNavigate();
@@ -19,8 +20,17 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const handleChange = (field) => (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading) return;
 
     setError("");
 
@@ -36,7 +46,7 @@ export default function RegisterPage() {
         fullName: formData.fullName,
         username: formData.username,
         email: formData.email,
-        phone: formData.phone,
+        phoneNumber: formData.phoneNumber,
         password: formData.password,
       });
 
@@ -72,6 +82,14 @@ export default function RegisterPage() {
               Isi data pribadi untuk mulai menggunakan dompet.
             </p>
           </div>
+          {error && (
+            <div
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3"
+            >
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
@@ -80,7 +98,7 @@ export default function RegisterPage() {
                 label="Nama lengkap"
                 type="text"
                 value={formData.fullName}
-                onChange={handleChange}
+                onChange={handleChange("fullName")}
                 placeholder="Nadia Putri"
                 required
               />
@@ -109,8 +127,8 @@ export default function RegisterPage() {
                 id="phone"
                 label="Nomor telepon"
                 type="tel"
-                value={formData.phone}
-                onChange={handleChange("phone")}
+                value={formData.phoneNumber}
+                onChange={handleChange("phoneNumber")}
                 placeholder="0812 3456 7890"
                 required
               />
@@ -141,7 +159,11 @@ export default function RegisterPage() {
             </p>
 
             <div className="pt-1">
-              <Button type="submit" children="Buat akun" />
+              <Button
+                type="submit"
+                disabled={loading}
+                children={loading ? "Membuat akun..." : "Buat akun"}
+              />
             </div>
           </form>
 

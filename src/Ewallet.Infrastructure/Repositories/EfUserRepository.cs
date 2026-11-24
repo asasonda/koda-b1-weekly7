@@ -1,4 +1,5 @@
 using Ewallet.Application.DTOs;
+using Ewallet.Application.DTOs.Dashboard;
 using Ewallet.Application.Repositories;
 using Ewallet.Infrastructure.Persistence;
 using EWallet.Domain.Entities;
@@ -76,27 +77,66 @@ public sealed class EfUserRepository : IUserRepository
         )).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<UserResponseDashboard?> GetDashboardAsync(long appUserId, CancellationToken cancellationToken)
+    {
+        var user = await _db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                u => u.Id == appUserId,
+                cancellationToken
+            );
+
+        if (user is null)
+            return null;
+
+        var wallet = await _db.Wallets
+            .AsNoTracking()
+            .Include(w => w.WalletMutations)
+                .ThenInclude(m => m.Transactions)
+            .FirstOrDefaultAsync(
+                w => w.AppUserId == appUserId,
+                cancellationToken
+            );
+
+        if (wallet is null)
+            return null;
+
+        var walletResponseDash = new WalletResponseDashboard(
+            wallet.Id,
+            wallet.WalletNumber,
+            wallet.Balance,
+            wallet.Status
+        );
+
+        var mutations = wallet.WalletMutations
+            .OrderByDescending(m => m.CreatedAtUtc)
+            .Take(5)
+            .Select(m => new WalletMutationResponse(
+                m.WalletId,
+                m.Direction,
+                m.Amount,
+                m.BalanceBefore,
+                m.BalanceAfter,
+                m.CreatedAtUtc
+            ))
+            .ToList();
+
+        return new UserResponseDashboard(
+            user.Id,
+            user.UserName ?? string.Empty,
+            user.FullName,
+            user.Email ?? string.Empty,
+            user.PhoneNumber ?? string.Empty,
+            user.Status,
+            user.CreatedAtUtc,
+            user.UpdatedAtUtc,
+            walletResponseDash,
+            mutations
+        );
+    }
 
     public async Task<string?> GetWalletNumberAsync(CancellationToken cancellationToken)
     {
         return await _db.Wallets.OrderByDescending(w => w.WalletNumber).Select(w => w.WalletNumber).FirstOrDefaultAsync(cancellationToken);
     }
-
-    // public async Task<IReadOnlyList<Users>> GetAllAsync(CancellationToken cancellationToken)
-    // {
-    //     return await _db.Users.AsNoTracking().Include(u => u.Wallets).OrderBy(u => u.Id).ToArrayAsync(cancellationToken);
-    // }
-
-    // public async Task<Users?> GetByIdAsync(long id, CancellationToken cancellationToken)
-    // {
-    //     return await _db.Users.AsNoTracking().Include(u => u.Wallets).FirstOrDefaultAsync(u => u.Id == id, cancellationToken: cancellationToken);
-    // }
-
-    // public async Task<bool> UpdateUserAsync(Users users, CancellationToken cancellationToken)
-    // {
-    //     _db.Users.Update(users);
-
-    //     await _db.SaveChangesAsync(cancellationToken);
-    //     return true;
-    // }
 }

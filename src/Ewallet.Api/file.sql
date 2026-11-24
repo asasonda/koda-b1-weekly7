@@ -77,3 +77,4 @@ GO
 EXEC sp_tables @table_owner = 'dbo';
 
 select * from dbo.AspNetUsers;
+select * from dbo.AspNetUserRoles;

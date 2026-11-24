@@ -46,16 +46,3 @@ public sealed record UserResponse(
     DateTimeOffset? UpdatedAtUtc,
     WalletResponse Wallet
 );
-
-// public sealed record UserResponse(
-//     long Id,
-//     long AppUserId,
-//     string UserName,
-//     string FullName,
-//     string Email,
-//     string PhoneNumber,
-//     string Status,
-//     DateTime CreatedAtUtc,
-//     DateTime? UpdatedAtUtc,
-//     WalletResponse Wallet
-// );

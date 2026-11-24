@@ -74,7 +74,7 @@ export const registerUser = async ({
   fullName,
   username,
   email,
-  phone,
+  phoneNumber,
   password,
 }) =>
   apiRequest("/api/auth/register", {
@@ -84,7 +84,7 @@ export const registerUser = async ({
       fullName: fullName.trim(),
       username: username.trim(),
       email: email.trim(),
-      phone: phone.trim(),
+      phoneNumber: phoneNumber.trim(),
       password,
     }),
   });
