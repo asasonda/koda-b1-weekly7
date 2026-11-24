@@ -5,8 +5,8 @@ POST {{base}}/api/transfer
 Content-Type: application/json
 
 {
-    "senderWalletId": 1,
-    "receiverWalletId": 2,
+    "senderWalletId": 3,
+    "receiverWalletId": 4,
     "amount": 5000,
     "description": "Transfer ke teman"
 }

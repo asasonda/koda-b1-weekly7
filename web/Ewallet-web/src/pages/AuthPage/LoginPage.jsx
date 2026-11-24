@@ -1,16 +1,40 @@
+
 import AuthAside from "@/components/page/login-register/AuthAside";
 import Button from "@/components/ui/Button";
 import InputForm from "@/components/ui/InputForm";
 import { useAuth } from "@/Hooks/useAuth";
 import { useState } from "react";
-import { Navigate, NavLink, useLocation, useNavigate } from "react-router";
+import { Navigate, NavLink, useNavigate } from "react-router";
+
+const hasRole = (roles, targetRole) =>
+  Array.isArray(roles) &&
+  roles.some(
+    (role) =>
+      typeof role === "string" &&
+      role.toUpperCase() === targetRole
+  );
+
+const getDashboardPath = (user) => {
+  if (hasRole(user?.roles, "ADMIN")) {
+    return "/admin/dashboard";
+  }
+
+  if (hasRole(user?.roles, "CUSTOMER")) {
+    return "/dashboard";
+  }
+
+  return "/forbidden";
+};
 
 export default function LoginPage() {
-  const { login, status, isAuthenticated } = useAuth();
+  const { login, status, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const destination = useLocation().state?.from?.pathname ?? "/dashboard";
 
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -21,7 +45,9 @@ export default function LoginPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
     if (isLoading) return;
+
     if (!formData.email.trim() || !formData.password) {
       return setErrorMessage("Email dan password wajib diisi.");
     }
@@ -30,9 +56,13 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(formData);
+      const session = await login(formData);
+
       setFormData((prev) => ({ ...prev, password: "" }));
-      navigate(destination, { replace: true });
+
+      navigate(getDashboardPath(session.user), {
+        replace: true,
+      });
     } catch (err) {
       const msg =
         err?.status === 401
@@ -42,6 +72,7 @@ export default function LoginPage() {
             : err instanceof Error
               ? err.message
               : "Login gagal. Silakan coba kembali.";
+
       setErrorMessage(msg);
     } finally {
       setIsLoading(false);
@@ -55,8 +86,15 @@ export default function LoginPage() {
       </main>
     );
   }
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
+  if (isAuthenticated) {
+    return (
+      <Navigate
+        to={getDashboardPath(user)}
+        replace
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
@@ -73,6 +111,7 @@ export default function LoginPage() {
             <h2 className="text-2xl md:text-[28px] font-bold text-[#1A1A1A] tracking-tight mb-2">
               Selamat datang kembali
             </h2>
+
             <p className="text-xs md:text-sm text-[#7A7A7A]">
               Masuk untuk melanjutkan ke dompetmu.
             </p>

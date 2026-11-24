@@ -5,7 +5,7 @@ GET {{base}}/api/wallets/1
 Accept: application/json
 
 ### topup
-POST {{base}}/api/wallets/4/topups
+POST {{base}}/api/wallets/3/topups
 Accept: application/json
 Content-Type: application/json
 
@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### Get Topup
-GET {{base}}/api/wallets/1/topups/detail
+GET {{base}}/api/wallets/3/topups/detail
 Accept: application/json
 
 

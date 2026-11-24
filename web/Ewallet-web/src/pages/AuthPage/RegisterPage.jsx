@@ -2,10 +2,35 @@ import { useState } from "react";
 import AuthAside from "@/components/page/login-register/AuthAside";
 import Button from "@/components/ui/Button";
 import InputForm from "@/components/ui/InputForm";
-import { NavLink, useNavigate } from "react-router";
+import { Navigate, NavLink, useNavigate } from "react-router";
 import { registerUser } from "@/services/authApi";
+import { useAuth } from "@/Hooks/useAuth";
+
+const getDashboardPath = (user) => {
+  const roles = user?.roles ?? [];
+
+  if (
+    roles.some(
+      (role) => typeof role === "string" && role.toUpperCase() === "ADMIN",
+    )
+  ) {
+    return "/admin/dashboard";
+  }
+
+  if (
+    roles.some(
+      (role) => typeof role === "string" && role.toUpperCase() === "CUSTOMER",
+    )
+  ) {
+    return "/dashboard";
+  }
+
+  return "/forbidden";
+};
 
 export default function RegisterPage() {
+  const { status, isAuthenticated, user } = useAuth();
+
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -63,6 +88,18 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  if (status === "checking") {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        Memeriksa sesi Login...
+      </main>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={getDashboardPath(user)} replace />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">

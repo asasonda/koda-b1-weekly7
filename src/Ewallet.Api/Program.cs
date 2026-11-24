@@ -7,6 +7,7 @@ using Ewallet.Infrastructure;
 using Ewallet.Infrastructure.Identity;
 using Ewallet.Infrastructure.Persistence;
 using Ewallet.Infrastructure.Seeding;
+using KodaStore.Application.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -170,7 +171,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             RoleClaimType = "role"
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AppPolicies.CanManageWallet, policy =>
+        policy.RequireRole("CUSTOMER")
+    );
+
+    options.AddPolicy(AppPolicies.CanManageUser, policy =>
+        policy.RequireRole("ADMIN")
+    );
+});
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

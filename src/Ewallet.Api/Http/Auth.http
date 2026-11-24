@@ -20,3 +20,36 @@ Content-Type: application/json
     "email": "andika@gmail.com",
     "password": "Andika123@@"
 }
+
+
+### Login customer
+# @name loginCustomer
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "zakky@gmail.com",
+    "password": "Seed@12345"
+}
+
+### Login admin
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "Andika@gmail.com",
+    "password": "Andika123@@"
+}
+
+### get wallet CUSTOMER
+GET {{baseUrl}}/api/dashboard
+Accept: application/json
+Authorization: Bearer {{loginCustomer.response.body.accessToken}}
+
+### get user dashboard admin
+GET {{baseUrl}}/api/admin/dashboard
+Authorization: Bearer {{loginAdmin.response.body.$.accessToken}}
+Accept: application/json

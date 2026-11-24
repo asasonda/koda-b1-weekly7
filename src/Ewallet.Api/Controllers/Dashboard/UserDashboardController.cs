@@ -1,19 +1,21 @@
 using Ewallet.Application.Services;
+using KodaStore.Application.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace Ewallet.Api.Controllers;
+namespace Ewallet.Api.Controllers.Dashboard;
 
 [ApiController]
 [Route("api/dashboard")]
-[Authorize(Roles = "CUSTOMER")]
+[Authorize(Policy = AppPolicies.CanManageWallet)]
 public sealed class DashboardController(IUserServices services) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetDashboard(CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdClaim = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (!long.TryParse(userIdClaim, out var appUserId))
             return Unauthorized();
 
